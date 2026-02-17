@@ -2,7 +2,9 @@ import { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext(null);
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://hormigapp.onrender.com/api';
+const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const API_URL = import.meta.env.VITE_API_URL ||
+    (isLocalhost ? 'http://localhost:8000/api' : 'https://hormigapp.onrender.com/api');
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
@@ -47,8 +49,13 @@ export function AuthProvider({ children }) {
         });
 
         if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.detail || 'Error al iniciar sesión');
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                const error = await response.json();
+                throw new Error(error.detail || JSON.stringify(error) || 'Error al iniciar sesión');
+            } else {
+                throw new Error(`Error del servidor (${response.status}). Asegúrate de que el backend esté ejecutándose.`);
+            }
         }
 
         const data = await response.json();
@@ -74,8 +81,13 @@ export function AuthProvider({ children }) {
         });
 
         if (!response.ok) {
-            const error = await response.json();
-            throw new Error(JSON.stringify(error));
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                const error = await response.json();
+                throw new Error(JSON.stringify(error));
+            } else {
+                throw new Error(`Error del servidor (${response.status}). El registro falló con una respuesta no válida.`);
+            }
         }
 
         return await response.json();
