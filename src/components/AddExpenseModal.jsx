@@ -11,6 +11,11 @@ const DEFAULT_CATEGORIES = [
     { value: 'otros', label: 'Otros', icon: '📦' },
 ];
 
+const maskName = (name) => {
+    if (!name) return '***';
+    return name.length > 2 ? name.substring(0, 2) + '***' : name + '***';
+};
+
 export function AddExpenseModal({ onClose, onSubmit }) {
     const [amount, setAmount] = useState('');
     const [category, setCategory] = useState('cafe');
@@ -179,7 +184,7 @@ export function AddExpenseModal({ onClose, onSubmit }) {
                                                 maxWidth: '100%', overflow: 'hidden',
                                                 textOverflow: 'ellipsis', whiteSpace: 'nowrap'
                                             }}>
-                                                {cat.name}
+                                                {cat.is_private ? maskName(cat.name) : cat.name}
                                             </span>
                                             {cat.is_private && (
                                                 <span style={{

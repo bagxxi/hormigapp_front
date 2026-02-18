@@ -3,6 +3,11 @@ import { useApi } from '../hooks/useApi';
 
 const EMOJI_OPTIONS = ['📌', '🎯', '💊', '🎁', '🏠', '🚗', '💻', '📱', '🎵', '🍺', '🌮', '💇', '🏋️', '📚', '🎬', '✈️', '🎮', '👕', '💰', '🔒'];
 
+const maskName = (name) => {
+    if (!name) return '***';
+    return name.length > 2 ? name.substring(0, 2) + '***' : name + '***';
+};
+
 export function Categories() {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -274,9 +279,9 @@ export function Categories() {
                                     /* View mode */
                                     <>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                            <span style={{ fontSize: '1.5rem' }}>{cat.icon}</span>
+                                            <span style={{ fontSize: '1.5rem' }}>{cat.is_private ? '🔒' : cat.icon}</span>
                                             <div>
-                                                <span style={{ fontWeight: 600 }}>{cat.name}</span>
+                                                <span style={{ fontWeight: 600 }}>{cat.is_private ? maskName(cat.name) : cat.name}</span>
                                                 {cat.is_private && (
                                                     <span style={{
                                                         marginLeft: '8px',
