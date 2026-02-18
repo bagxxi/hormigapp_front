@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useApi } from '../hooks/useApi';
+import { EditExpenseModal } from '../components/EditExpenseModal';
 
 const CATEGORY_ICONS = {
     cafe: '☕',
@@ -17,7 +18,8 @@ export function History() {
     const [savings, setSavings] = useState(null);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('all');
-    const { getExpenses, getHistory, downloadHistoryPDF, deleteExpense, getTotalSavings } = useApi();
+    const [editingExpense, setEditingExpense] = useState(null);
+    const { getExpenses, getHistory, downloadHistoryPDF, deleteExpense, updateExpense, getTotalSavings } = useApi();
 
     useEffect(() => {
         loadData();
@@ -76,6 +78,12 @@ export function History() {
             await deleteExpense(id);
             loadData();
         }
+    };
+
+    const handleEditExpense = async (id, data) => {
+        await updateExpense(id, data);
+        setEditingExpense(null);
+        loadData();
     };
 
     if (loading) {
@@ -168,6 +176,22 @@ export function History() {
                                             </div>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                                                 <span className="expense-amount">{formatCurrency(expense.amount)}</span>
+                                                <button
+                                                    onClick={() => setEditingExpense(expense)}
+                                                    style={{
+                                                        background: 'none',
+                                                        border: 'none',
+                                                        color: 'var(--primary-blue-light)',
+                                                        cursor: 'pointer',
+                                                        padding: '4px'
+                                                    }}
+                                                    title="Editar"
+                                                >
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                                    </svg>
+                                                </button>
                                                 <button
                                                     onClick={() => handleDeleteExpense(expense.id)}
                                                     style={{
@@ -279,6 +303,16 @@ export function History() {
                         </div>
                     )}
                 </>
+            )}
+
+            {/* Edit Expense Modal */}
+            {editingExpense && (
+                <EditExpenseModal
+                    expense={editingExpense}
+                    type="ant"
+                    onClose={() => setEditingExpense(null)}
+                    onSubmit={handleEditExpense}
+                />
             )}
         </>
     );

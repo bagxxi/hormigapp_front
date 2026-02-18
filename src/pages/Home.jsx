@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useApi } from '../hooks/useApi';
 import { AddExpenseModal } from '../components/AddExpenseModal';
+import { EditExpenseModal } from '../components/EditExpenseModal';
 
 const CATEGORY_ICONS = {
     cafe: '☕',
@@ -18,7 +19,8 @@ export function Home() {
     const [expenses, setExpenses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
-    const { getBudget, getExpenses, addExpense } = useApi();
+    const [editingExpense, setEditingExpense] = useState(null);
+    const { getBudget, getExpenses, addExpense, updateExpense } = useApi();
 
     useEffect(() => {
         loadData();
@@ -76,6 +78,12 @@ export function Home() {
         } catch (error) {
             throw error;
         }
+    };
+
+    const handleEditExpense = async (id, data) => {
+        await updateExpense(id, data);
+        setEditingExpense(null);
+        loadData();
     };
 
     if (loading) {
@@ -147,7 +155,25 @@ export function Home() {
                                         <span>{expense.description || 'Sin descripción'} • {formatDate(expense.date)}</span>
                                     </div>
                                 </div>
-                                <span className="expense-amount">{formatCurrency(expense.amount)}</span>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <span className="expense-amount">{formatCurrency(expense.amount)}</span>
+                                    <button
+                                        onClick={() => setEditingExpense(expense)}
+                                        style={{
+                                            background: 'none',
+                                            border: 'none',
+                                            color: 'var(--primary-blue-light)',
+                                            cursor: 'pointer',
+                                            padding: '4px'
+                                        }}
+                                        title="Editar"
+                                    >
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
                         ))}
                     </div>
@@ -169,6 +195,16 @@ export function Home() {
                 <AddExpenseModal
                     onClose={() => setShowModal(false)}
                     onSubmit={handleAddExpense}
+                />
+            )}
+
+            {/* Edit Expense Modal */}
+            {editingExpense && (
+                <EditExpenseModal
+                    expense={editingExpense}
+                    type="ant"
+                    onClose={() => setEditingExpense(null)}
+                    onSubmit={handleEditExpense}
                 />
             )}
         </>

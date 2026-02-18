@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useApi } from '../hooks/useApi';
+import { EditExpenseModal } from '../components/EditExpenseModal';
 
 export function Budget() {
     const [budget, setBudget] = useState(null);
@@ -7,6 +8,7 @@ export function Budget() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [showAddFixed, setShowAddFixed] = useState(false);
+    const [editingFixed, setEditingFixed] = useState(null);
     const [newFixedName, setNewFixedName] = useState('');
     const [newFixedAmount, setNewFixedAmount] = useState('');
 
@@ -15,7 +17,7 @@ export function Budget() {
     const [savingsGoal, setSavingsGoal] = useState('');
     const [cycleStartDay, setCycleStartDay] = useState('');
 
-    const { getBudget, updateBudget, getFixedExpenses, addFixedExpense, deleteFixedExpense } = useApi();
+    const { getBudget, updateBudget, getFixedExpenses, addFixedExpense, updateFixedExpense, deleteFixedExpense } = useApi();
 
     useEffect(() => {
         loadData();
@@ -77,6 +79,12 @@ export function Budget() {
             await deleteFixedExpense(id);
             loadData();
         }
+    };
+
+    const handleEditFixed = async (id, data) => {
+        await updateFixedExpense(id, data);
+        setEditingFixed(null);
+        loadData();
     };
 
     const formatCurrency = (amount) => {
@@ -221,6 +229,21 @@ export function Budget() {
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                                     <span style={{ fontWeight: 600 }}>{formatCurrency(expense.amount)}</span>
                                     <button
+                                        onClick={() => setEditingFixed(expense)}
+                                        style={{
+                                            background: 'none',
+                                            border: 'none',
+                                            color: 'var(--primary-blue-light)',
+                                            cursor: 'pointer'
+                                        }}
+                                        title="Editar"
+                                    >
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                        </svg>
+                                    </button>
+                                    <button
                                         onClick={() => handleDeleteFixed(expense.id)}
                                         style={{
                                             background: 'none',
@@ -286,6 +309,16 @@ export function Budget() {
                     </div>
                 </div>
             </div>
+
+            {/* Edit Fixed Expense Modal */}
+            {editingFixed && (
+                <EditExpenseModal
+                    expense={editingFixed}
+                    type="fixed"
+                    onClose={() => setEditingFixed(null)}
+                    onSubmit={handleEditFixed}
+                />
+            )}
         </>
     );
 }

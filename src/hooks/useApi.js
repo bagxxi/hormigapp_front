@@ -60,6 +60,18 @@ export function useApi() {
         return response.json();
     };
 
+    const updateExpense = async (id, data) => {
+        const response = await fetchWithAuth(`/finance/expenses/${id}/`, {
+            method: 'PATCH',
+            body: JSON.stringify(data),
+        });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(JSON.stringify(error));
+        }
+        return response.json();
+    };
+
     const deleteExpense = async (id) => {
         const response = await fetchWithAuth(`/finance/expenses/${id}/`, {
             method: 'DELETE',
@@ -78,6 +90,18 @@ export function useApi() {
             method: 'POST',
             body: JSON.stringify(data),
         });
+        return response.json();
+    };
+
+    const updateFixedExpense = async (id, data) => {
+        const response = await fetchWithAuth(`/finance/fixed-expenses/${id}/`, {
+            method: 'PATCH',
+            body: JSON.stringify(data),
+        });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(JSON.stringify(error));
+        }
         return response.json();
     };
 
@@ -125,9 +149,11 @@ export function useApi() {
         updateBudget,
         getExpenses,
         addExpense,
+        updateExpense,
         deleteExpense,
         getFixedExpenses,
         addFixedExpense,
+        updateFixedExpense,
         deleteFixedExpense,
         getHistory,
         downloadHistoryPDF,
