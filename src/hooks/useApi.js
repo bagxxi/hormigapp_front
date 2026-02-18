@@ -144,6 +144,67 @@ export function useApi() {
         return response.json();
     };
 
+    // Custom Categories
+    const getCustomCategories = async () => {
+        const response = await fetchWithAuth('/finance/categories/');
+        return response.json();
+    };
+
+    const addCustomCategory = async (data) => {
+        const response = await fetchWithAuth('/finance/categories/', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(JSON.stringify(error));
+        }
+        return response.json();
+    };
+
+    const updateCustomCategory = async (id, data) => {
+        const response = await fetchWithAuth(`/finance/categories/${id}/`, {
+            method: 'PATCH',
+            body: JSON.stringify(data),
+        });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(JSON.stringify(error));
+        }
+        return response.json();
+    };
+
+    const deleteCustomCategory = async (id) => {
+        const response = await fetchWithAuth(`/finance/categories/${id}/`, {
+            method: 'DELETE',
+        });
+        return response.ok;
+    };
+
+    const toggleCategoryPrivacy = async (id, password, isPrivate) => {
+        const response = await fetchWithAuth(`/finance/categories/${id}/toggle-privacy/`, {
+            method: 'POST',
+            body: JSON.stringify({ password, is_private: isPrivate }),
+        });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(JSON.stringify(error));
+        }
+        return response.json();
+    };
+
+    const revealPrivateExpenses = async (password) => {
+        const response = await fetchWithAuth('/finance/expenses/reveal-private/', {
+            method: 'POST',
+            body: JSON.stringify({ password }),
+        });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(JSON.stringify(error));
+        }
+        return response.json();
+    };
+
     return {
         getBudget,
         updateBudget,
@@ -160,6 +221,12 @@ export function useApi() {
         getTotalSavings,
         completeOnboarding,
         resetOnboarding,
+        getCustomCategories,
+        addCustomCategory,
+        updateCustomCategory,
+        deleteCustomCategory,
+        toggleCategoryPrivacy,
+        revealPrivateExpenses,
     };
 }
 

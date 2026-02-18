@@ -7,6 +7,7 @@ import { History } from './pages/History';
 import { Budget } from './pages/Budget';
 import { Profile } from './pages/Profile';
 import { SharedExpenses } from './pages/SharedExpenses';
+import { Categories } from './pages/Categories';
 import { ForgotPassword } from './pages/ForgotPassword';
 import { ResetPassword } from './pages/ResetPassword';
 import { ConfirmEmail } from './pages/ConfirmEmail';
@@ -76,6 +77,7 @@ function AppRoutes() {
         <Route path="/historial" element={<History />} />
         <Route path="/presupuesto" element={<Budget />} />
         <Route path="/compartidos" element={<SharedExpenses />} />
+        <Route path="/categorias" element={<Categories />} />
         <Route path="/perfil" element={<Profile />} />
       </Route>
       <Route path="*" element={<Navigate to="/" />} />

@@ -19,7 +19,12 @@ export function History() {
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('all');
     const [editingExpense, setEditingExpense] = useState(null);
-    const { getExpenses, getHistory, downloadHistoryPDF, deleteExpense, updateExpense, getTotalSavings } = useApi();
+    const [showRevealModal, setShowRevealModal] = useState(false);
+    const [revealPassword, setRevealPassword] = useState('');
+    const [revealError, setRevealError] = useState('');
+    const [revealLoading, setRevealLoading] = useState(false);
+    const [revealedExpenses, setRevealedExpenses] = useState(null);
+    const { getExpenses, getHistory, downloadHistoryPDF, deleteExpense, updateExpense, getTotalSavings, revealPrivateExpenses } = useApi();
 
     useEffect(() => {
         loadData();
@@ -148,6 +153,21 @@ export function History() {
                 >
                     Cierres mensuales
                 </button>
+                {expenses.some(e => e.is_private) && (
+                    <button
+                        className={`btn ${revealedExpenses ? 'btn-primary' : 'btn-secondary'}`}
+                        onClick={() => {
+                            if (revealedExpenses) {
+                                setRevealedExpenses(null);
+                            } else {
+                                setShowRevealModal(true);
+                            }
+                        }}
+                        style={{ marginLeft: 'auto' }}
+                    >
+                        {revealedExpenses ? '🔒 Ocultar' : '🔓 Revelar privados'}
+                    </button>
+                )}
             </div>
 
             {filter === 'all' ? (
@@ -163,54 +183,64 @@ export function History() {
                                     {date}
                                 </h3>
                                 <div className="expense-list">
-                                    {dayExpenses.map((expense) => (
-                                        <div key={expense.id} className="expense-item">
-                                            <div className="expense-info">
-                                                <div className={`expense-icon ${expense.category}`}>
-                                                    {CATEGORY_ICONS[expense.category] || '📦'}
+                                    {dayExpenses.map((expense) => {
+                                        // Si hay datos revelados, usar esos en su lugar
+                                        const displayExpense = revealedExpenses
+                                            ? (revealedExpenses.find(e => e.id === expense.id) || expense)
+                                            : expense;
+                                        return (
+                                            <div key={expense.id} className="expense-item">
+                                                <div className="expense-info">
+                                                    <div className={`expense-icon ${displayExpense.category || ''}`}>
+                                                        {displayExpense.is_private && !revealedExpenses ? '🔒' : (displayExpense.custom_category_icon || CATEGORY_ICONS[displayExpense.category] || '📦')}
+                                                    </div>
+                                                    <div className="expense-details">
+                                                        <h4>{displayExpense.category_display}{displayExpense.is_private && !revealedExpenses && <span style={{ marginLeft: '4px', fontSize: '0.65rem', color: '#EF4444' }}>PRIVADO</span>}</h4>
+                                                        <span>{displayExpense.description || 'Sin descripción'}</span>
+                                                    </div>
                                                 </div>
-                                                <div className="expense-details">
-                                                    <h4>{expense.category_display}</h4>
-                                                    <span>{expense.description || 'Sin descripción'}</span>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                                    <span className="expense-amount">
+                                                        {displayExpense.is_private && displayExpense.amount === '***' ? '$ ***' : formatCurrency(displayExpense.amount)}
+                                                    </span>
+                                                    {!displayExpense.is_private && (
+                                                        <button
+                                                            onClick={() => setEditingExpense(expense)}
+                                                            style={{
+                                                                background: 'none',
+                                                                border: 'none',
+                                                                color: 'var(--primary-blue-light)',
+                                                                cursor: 'pointer',
+                                                                padding: '4px'
+                                                            }}
+                                                            title="Editar"
+                                                        >
+                                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                                            </svg>
+                                                        </button>
+                                                    )}
+                                                    <button
+                                                        onClick={() => handleDeleteExpense(expense.id)}
+                                                        style={{
+                                                            background: 'none',
+                                                            border: 'none',
+                                                            color: 'var(--text-secondary)',
+                                                            cursor: 'pointer',
+                                                            padding: '4px'
+                                                        }}
+                                                        title="Eliminar"
+                                                    >
+                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                            <polyline points="3 6 5 6 21 6" />
+                                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                                                        </svg>
+                                                    </button>
                                                 </div>
                                             </div>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                                <span className="expense-amount">{formatCurrency(expense.amount)}</span>
-                                                <button
-                                                    onClick={() => setEditingExpense(expense)}
-                                                    style={{
-                                                        background: 'none',
-                                                        border: 'none',
-                                                        color: 'var(--primary-blue-light)',
-                                                        cursor: 'pointer',
-                                                        padding: '4px'
-                                                    }}
-                                                    title="Editar"
-                                                >
-                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                                                    </svg>
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDeleteExpense(expense.id)}
-                                                    style={{
-                                                        background: 'none',
-                                                        border: 'none',
-                                                        color: 'var(--text-secondary)',
-                                                        cursor: 'pointer',
-                                                        padding: '4px'
-                                                    }}
-                                                    title="Eliminar"
-                                                >
-                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                                        <polyline points="3 6 5 6 21 6" />
-                                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                                                    </svg>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             </div>
                         ))
@@ -313,6 +343,69 @@ export function History() {
                     onClose={() => setEditingExpense(null)}
                     onSubmit={handleEditExpense}
                 />
+            )}
+
+            {/* Reveal Private Modal */}
+            {showRevealModal && (
+                <div className="modal-overlay" onClick={() => setShowRevealModal(false)}>
+                    <div className="modal" onClick={e => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h2 className="modal-title">🔓 Revelar datos privados</h2>
+                            <button className="modal-close" onClick={() => setShowRevealModal(false)}>
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <line x1="18" y1="6" x2="6" y2="18" />
+                                    <line x1="6" y1="6" x2="18" y2="18" />
+                                </svg>
+                            </button>
+                        </div>
+                        <p style={{ color: 'var(--text-secondary)', marginBottom: '16px', fontSize: '0.875rem' }}>
+                            Ingresa tu contraseña para ver los datos completos de tus gastos privados.
+                        </p>
+                        <div className="form-group">
+                            <label className="form-label">Contraseña</label>
+                            <input
+                                type="password"
+                                className="form-input"
+                                placeholder="Tu contraseña"
+                                value={revealPassword}
+                                onChange={(e) => setRevealPassword(e.target.value)}
+                                autoFocus
+                            />
+                        </div>
+                        {revealError && (
+                            <p style={{ color: 'var(--balance-negative)', marginBottom: '12px', fontSize: '0.875rem' }}>
+                                {revealError}
+                            </p>
+                        )}
+                        <button
+                            onClick={async () => {
+                                if (!revealPassword) { setRevealError('Ingresa tu contraseña'); return; }
+                                setRevealLoading(true);
+                                setRevealError('');
+                                try {
+                                    const data = await revealPrivateExpenses(revealPassword);
+                                    setRevealedExpenses(data);
+                                    setShowRevealModal(false);
+                                    setRevealPassword('');
+                                } catch (err) {
+                                    try {
+                                        const errorData = JSON.parse(err.message);
+                                        setRevealError(errorData.error || 'Error al verificar');
+                                    } catch {
+                                        setRevealError('Contraseña incorrecta');
+                                    }
+                                } finally {
+                                    setRevealLoading(false);
+                                }
+                            }}
+                            className="btn btn-primary"
+                            style={{ width: '100%', padding: '12px' }}
+                            disabled={revealLoading || !revealPassword}
+                        >
+                            {revealLoading ? 'Verificando...' : 'Revelar datos'}
+                        </button>
+                    </div>
+                </div>
             )}
         </>
     );

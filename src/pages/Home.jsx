@@ -147,32 +147,36 @@ export function Home() {
                         {expenses.slice(0, 5).map((expense) => (
                             <div key={expense.id} className="expense-item">
                                 <div className="expense-info">
-                                    <div className={`expense-icon ${expense.category}`}>
-                                        {CATEGORY_ICONS[expense.category] || '📦'}
+                                    <div className={`expense-icon ${expense.category || ''}`}>
+                                        {expense.is_private ? '🔒' : (expense.custom_category_icon || CATEGORY_ICONS[expense.category] || '📦')}
                                     </div>
                                     <div className="expense-details">
-                                        <h4>{expense.category_display}</h4>
+                                        <h4>{expense.category_display}{expense.is_private && <span style={{ marginLeft: '4px', fontSize: '0.65rem', color: '#EF4444' }}>PRIVADO</span>}</h4>
                                         <span>{expense.description || 'Sin descripción'} • {formatDate(expense.date)}</span>
                                     </div>
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                    <span className="expense-amount">{formatCurrency(expense.amount)}</span>
-                                    <button
-                                        onClick={() => setEditingExpense(expense)}
-                                        style={{
-                                            background: 'none',
-                                            border: 'none',
-                                            color: 'var(--primary-blue-light)',
-                                            cursor: 'pointer',
-                                            padding: '4px'
-                                        }}
-                                        title="Editar"
-                                    >
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                                        </svg>
-                                    </button>
+                                    <span className="expense-amount">
+                                        {expense.is_private && expense.amount === '***' ? '$ ***' : formatCurrency(expense.amount)}
+                                    </span>
+                                    {!expense.is_private && (
+                                        <button
+                                            onClick={() => setEditingExpense(expense)}
+                                            style={{
+                                                background: 'none',
+                                                border: 'none',
+                                                color: 'var(--primary-blue-light)',
+                                                cursor: 'pointer',
+                                                padding: '4px'
+                                            }}
+                                            title="Editar"
+                                        >
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                            </svg>
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         ))}

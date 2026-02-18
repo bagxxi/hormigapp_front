@@ -38,6 +38,14 @@ export function BottomNav() {
                     Presupuesto
                 </NavLink>
 
+                <NavLink id="nav-categories" to="/categorias" className={({ isActive }) => `bottom-nav-link ${isActive ? 'active' : ''}`}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+                        <line x1="7" y1="7" x2="7.01" y2="7" />
+                    </svg>
+                    Categorías
+                </NavLink>
+
                 <NavLink id="nav-profile" to="/perfil" className={({ isActive }) => `bottom-nav-link ${isActive ? 'active' : ''}`}>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
