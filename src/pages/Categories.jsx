@@ -76,7 +76,13 @@ export function Categories() {
     };
 
     const handleDelete = async (id) => {
-        if (confirm('¿Eliminar esta categoría? Los gastos asociados quedarán sin categoría personalizada.')) {
+        const cat = categories.find(c => c.id === id);
+        let message = '¿Eliminar esta categoría?\n\n';
+        message += '• Los gastos asociados se moverán a la categoría "Otros"\n';
+        if (cat && cat.is_private) {
+            message += '⚠️ IMPORTANTE: Los datos de esos gastos dejarán de estar ocultos y serán completamente visibles.';
+        }
+        if (confirm(message)) {
             await deleteCustomCategory(id);
             loadCategories();
         }
