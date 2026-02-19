@@ -13,22 +13,16 @@ export function Profile() {
     // Session timer
     const [sessionTime, setSessionTime] = useState(0);
 
-    // Password change form
-    const [showPasswordForm, setShowPasswordForm] = useState(false);
-    const [currentPassword, setCurrentPassword] = useState('');
-    const [newPassword, setNewPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [passwordError, setPasswordError] = useState('');
-    const [passwordSuccess, setPasswordSuccess] = useState('');
     const [passwordLoading, setPasswordLoading] = useState(false);
 
-    // Email change form
-    const [showEmailForm, setShowEmailForm] = useState(false);
-    const [newEmail, setNewEmail] = useState('');
-    const [emailPassword, setEmailPassword] = useState('');
-    const [emailMessage, setEmailMessage] = useState('');
-    const [emailError, setEmailError] = useState('');
-    const [emailLoading, setEmailLoading] = useState(false);
+    // Alias edit form
+    const [showAliasForm, setShowAliasForm] = useState(false);
+    const [newAlias, setNewAlias] = useState(user?.display_name || '');
+    const [aliasError, setAliasError] = useState('');
+    const [aliasSuccess, setAliasSuccess] = useState('');
+    const [aliasLoading, setAliasLoading] = useState(false);
+
+
 
     // Session timer effect
     useEffect(() => {
@@ -145,59 +139,45 @@ export function Profile() {
         }
     };
 
-    const handleEmailChange = async (e) => {
+    const handleAliasChange = async (e) => {
         e.preventDefault();
-        setEmailMessage('');
-        setEmailError('');
+        setAliasError('');
+        setAliasSuccess('');
 
-        if (!newEmail.includes('@')) {
-            setEmailError('Ingresa un email válido');
+        if (newAlias.length > 20) {
+            setAliasError('El alias no puede superar los 20 caracteres');
             return;
         }
 
-        if (!emailPassword) {
-            setEmailError('Debes ingresar tu contraseña');
-            return;
-        }
-
-        setEmailLoading(true);
+        setAliasLoading(true);
 
         try {
-            const response = await fetch(`${API_URL}/auth/email-change/request/`, {
-                method: 'POST',
+            const response = await fetch(`${API_URL}/auth/me/`, {
+                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({
-                    new_email: newEmail,
-                    password: emailPassword
+                    display_name: newAlias
                 })
             });
 
-            const data = await response.json();
-
             if (!response.ok) {
-                if (data.new_email) {
-                    setEmailError(Array.isArray(data.new_email) ? data.new_email[0] : data.new_email);
-                } else if (data.password) {
-                    setEmailError(Array.isArray(data.password) ? data.password[0] : data.password);
-                } else if (data.error) {
-                    setEmailError(data.error);
-                } else {
-                    setEmailError('Error al solicitar cambio de email');
-                }
+                const data = await response.json();
+                setAliasError(data.display_name ? data.display_name[0] : 'Error al actualizar el alias');
                 return;
             }
 
-            setEmailMessage(data.message);
-            setNewEmail('');
-            setEmailPassword('');
-            setShowEmailForm(false);
+            setAliasSuccess('Alias actualizado correctamente');
+            setShowAliasForm(false);
+            // El contexto se actualizará en la próxima recarga o podríamos llamar a una función de reload si existiera en el contexto
+            // Para asegurar visibilidad inmediata, recargamos la página o forzamos actualización de estado global si useAuth lo permite.
+            window.location.reload();
         } catch (err) {
-            setEmailError('Error de conexión. Intenta nuevamente.');
+            setAliasError('Error de conexión. Intenta nuevamente.');
         } finally {
-            setEmailLoading(false);
+            setAliasLoading(false);
         }
     };
 
@@ -231,11 +211,11 @@ export function Profile() {
                         fontWeight: 600,
                         boxShadow: 'var(--shadow-md)'
                     }}>
-                        {user?.username?.charAt(0).toUpperCase() || 'U'}
+                        {user?.display_name?.charAt(0).toUpperCase() || user?.username?.charAt(0).toUpperCase() || 'U'}
                     </div>
                     <div>
-                        <h2 style={{ marginBottom: '4px', fontSize: '1.25rem' }}>{user?.username}</h2>
-                        <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>{user?.email}</p>
+                        <h2 style={{ marginBottom: '4px', fontSize: '1.25rem' }}>{user?.display_name || user?.username}</h2>
+                        <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>@{user?.username} • {user?.email}</p>
                     </div>
                 </div>
             </div>
@@ -349,91 +329,55 @@ export function Profile() {
                 )}
             </div>
 
-            {/* Change Email Section */}
+            {/* Alias Section */}
             <div className="card" style={{ marginBottom: '16px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: showEmailForm ? '16px' : '0' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: showAliasForm ? '16px' : '0' }}>
                     <div>
-                        <h3 style={{ marginBottom: '4px' }}>Correo electrónico</h3>
+                        <h3 style={{ marginBottom: '4px' }}>Alias / Nombre visible</h3>
                         <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-                            {user?.email}
+                            {user?.display_name}
                         </p>
                     </div>
                     <button
                         className="btn btn-secondary"
                         onClick={() => {
-                            setShowEmailForm(!showEmailForm);
-                            setEmailMessage('');
-                            setEmailError('');
-                            setEmailPassword('');
+                            setShowAliasForm(!showAliasForm);
+                            setAliasError('');
+                            setAliasSuccess('');
+                            setNewAlias(user?.display_name || '');
                         }}
                     >
-                        {showEmailForm ? 'Cancelar' : 'Cambiar'}
+                        {showAliasForm ? 'Cancelar' : 'Cambiar'}
                     </button>
                 </div>
 
-                {emailMessage && !showEmailForm && (
-                    <p style={{
-                        color: 'var(--balance-positive)',
-                        fontSize: '0.875rem',
-                        marginTop: '12px',
-                        padding: '12px',
-                        background: 'rgba(16, 185, 129, 0.1)',
-                        borderRadius: '8px'
-                    }}>
-                        ✅ {emailMessage}
-                    </p>
-                )}
-
-                {showEmailForm && (
-                    <form onSubmit={handleEmailChange} style={{
+                {showAliasForm && (
+                    <form onSubmit={handleAliasChange} style={{
                         padding: '16px',
                         background: 'var(--bg-light)',
                         borderRadius: '8px',
                         marginTop: '8px'
                     }}>
                         <div className="form-group">
-                            <label className="form-label">Nuevo correo electrónico</label>
+                            <label className="form-label">Nuevo alias</label>
                             <input
-                                type="email"
+                                type="text"
                                 className="form-input"
-                                placeholder="nuevo@email.com"
-                                value={newEmail}
-                                onChange={(e) => setNewEmail(e.target.value)}
+                                placeholder="Ej: El Destructor"
+                                value={newAlias}
+                                onChange={(e) => setNewAlias(e.target.value)}
                                 required
+                                maxLength={20}
                             />
                         </div>
 
-                        <div className="form-group">
-                            <label className="form-label">Contraseña actual</label>
-                            <input
-                                type="password"
-                                className="form-input"
-                                placeholder="••••••••"
-                                value={emailPassword}
-                                onChange={(e) => setEmailPassword(e.target.value)}
-                                required
-                            />
-                        </div>
-
-                        <p style={{
-                            fontSize: '0.75rem',
-                            color: 'var(--text-secondary)',
-                            marginBottom: '12px',
-                            padding: '8px',
-                            background: 'var(--bg-white)',
-                            borderRadius: '6px',
-                            border: '1px solid var(--border-light)'
-                        }}>
-                            📧 Se enviará un enlace de confirmación a tu correo ACTUAL para verificar el cambio.
-                        </p>
-
-                        {emailError && (
+                        {aliasError && (
                             <p style={{
                                 color: 'var(--balance-negative)',
                                 marginBottom: '12px',
                                 fontSize: '0.875rem'
                             }}>
-                                {emailError}
+                                {aliasError}
                             </p>
                         )}
 
@@ -441,9 +385,9 @@ export function Profile() {
                             type="submit"
                             className="btn btn-primary"
                             style={{ width: '100%' }}
-                            disabled={emailLoading}
+                            disabled={aliasLoading}
                         >
-                            {emailLoading ? 'Enviando...' : 'Enviar enlace de confirmación'}
+                            {aliasLoading ? 'Guardando...' : 'Guardar alias'}
                         </button>
                     </form>
                 )}
@@ -454,8 +398,12 @@ export function Profile() {
                 <h3 style={{ marginBottom: '16px' }}>Información de la cuenta</h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid var(--border-light)' }}>
+                        <span style={{ color: 'var(--text-secondary)' }}>Alias actual</span>
+                        <span style={{ fontWeight: 500 }}>{user?.display_name || 'No asignado'}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid var(--border-light)' }}>
                         <span style={{ color: 'var(--text-secondary)' }}>Nombre de usuario</span>
-                        <span style={{ fontWeight: 500 }}>{user?.username}</span>
+                        <span style={{ fontWeight: 500 }}>@{user?.username}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid var(--border-light)' }}>
                         <span style={{ color: 'var(--text-secondary)' }}>Email</span>
