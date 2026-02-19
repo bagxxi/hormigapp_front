@@ -13,6 +13,13 @@ export function Profile() {
     // Session timer
     const [sessionTime, setSessionTime] = useState(0);
 
+    // Password change form
+    const [showPasswordForm, setShowPasswordForm] = useState(false);
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [passwordError, setPasswordError] = useState('');
+    const [passwordSuccess, setPasswordSuccess] = useState('');
     const [passwordLoading, setPasswordLoading] = useState(false);
 
     // Alias edit form
