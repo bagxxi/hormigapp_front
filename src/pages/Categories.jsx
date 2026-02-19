@@ -473,7 +473,7 @@ export function Categories() {
 
                         <div style={{ marginBottom: '20px' }}>
                             <p style={{ color: 'var(--text-secondary)', marginBottom: '12px', fontSize: '0.9rem' }}>
-                                ¿Estás seguro de que quieres eliminar la categoría <strong>"{deleteModal.category.name}"</strong>?
+                                ¿Estás seguro de que quieres eliminar la categoría <strong>"{deleteModal.category.is_private ? maskName(deleteModal.category.name) : deleteModal.category.name}"</strong>?
                             </p>
                             <div style={{
                                 background: 'var(--bg-light)',
