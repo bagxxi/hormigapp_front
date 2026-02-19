@@ -46,7 +46,7 @@ export function Layout() {
             </main>
             <BottomNav />
             <footer className="footer">
-                © 2024 HormigApp - Tu aliado contra los gastos hormiga
+                © 2026 HormigApp - Tu aliado contra los gastos hormiga
             </footer>
 
             {/* Tour de onboarding para nuevos usuarios */}

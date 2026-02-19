@@ -25,6 +25,19 @@ export function Login() {
                 await login(username, password);
                 navigate('/');
             } else {
+                // Validación de nombre de usuario (solo para registro)
+                const usernameRegex = /^[a-zA-Z0-9]+$/;
+                if (username.length < 3 || username.length > 12) {
+                    setError('El usuario debe tener entre 3 y 12 caracteres');
+                    setLoading(false);
+                    return;
+                }
+                if (!usernameRegex.test(username)) {
+                    setError('El usuario solo puede contener letras y números');
+                    setLoading(false);
+                    return;
+                }
+
                 if (password !== passwordConfirm) {
                     setError('Las contraseñas no coinciden');
                     setLoading(false);
@@ -59,6 +72,8 @@ export function Login() {
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             required
+                            minLength={3}
+                            maxLength={12}
                             autoFocus
                         />
                     </div>
