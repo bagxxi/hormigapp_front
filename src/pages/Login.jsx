@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import logoImg from '../assets/hormigapplogo.png';
 
 export function Login() {
     const [isLogin, setIsLogin] = useState(true);
@@ -44,7 +45,7 @@ export function Login() {
         <div className="login-container">
             <div className="card login-card">
                 <div className="login-header">
-                    <h1>🐜 HormigApp</h1>
+                    <img src={logoImg} alt="HormigApp" style={{ width: '140px', margin: '0 auto 12px', display: 'block' }} />
                     <p>{isLogin ? 'Inicia sesión para continuar' : 'Crea tu cuenta'}</p>
                 </div>
 

@@ -20,14 +20,20 @@ export function Categories() {
     const [editIcon, setEditIcon] = useState('📌');
 
     // Privacy modal
-    const [privacyModal, setPrivacyModal] = useState(null); // { categoryId, currentPrivacy }
+    const [privacyModal, setPrivacyModal] = useState(null);
     const [privacyPassword, setPrivacyPassword] = useState('');
     const [privacyError, setPrivacyError] = useState('');
     const [privacyLoading, setPrivacyLoading] = useState(false);
 
+    // Delete modal
+    const [deleteModal, setDeleteModal] = useState(null); // { category }
+    const [deletePassword, setDeletePassword] = useState('');
+    const [deleteError, setDeleteError] = useState('');
+    const [deleteLoading, setDeleteLoading] = useState(false);
+
     const {
         getCustomCategories, addCustomCategory, updateCustomCategory,
-        deleteCustomCategory, toggleCategoryPrivacy
+        deleteCustomCategory, toggleCategoryPrivacy, revealPrivateExpenses
     } = useApi();
 
     useEffect(() => {
@@ -77,14 +83,42 @@ export function Categories() {
 
     const handleDelete = async (id) => {
         const cat = categories.find(c => c.id === id);
-        let message = '¿Eliminar esta categoría?\n\n';
-        message += '• Los gastos asociados se moverán a la categoría "Otros"\n';
-        if (cat && cat.is_private) {
-            message += '⚠️ IMPORTANTE: Los datos de esos gastos dejarán de estar ocultos y serán completamente visibles.';
+        setDeleteModal({ category: cat });
+        setDeletePassword('');
+        setDeleteError('');
+    };
+
+    const confirmDelete = async () => {
+        if (!deleteModal) return;
+        const cat = deleteModal.category;
+
+        // Si es privada, verificar contraseña primero
+        if (cat.is_private) {
+            if (!deletePassword) {
+                setDeleteError('Ingresa tu contraseña para eliminar una categoría privada');
+                return;
+            }
+            setDeleteLoading(true);
+            setDeleteError('');
+            try {
+                // Usamos revealPrivateExpenses como una forma de verificar la contraseña
+                await revealPrivateExpenses(deletePassword);
+            } catch (err) {
+                setDeleteError('Contraseña incorrecta');
+                setDeleteLoading(false);
+                return;
+            }
         }
-        if (confirm(message)) {
-            await deleteCustomCategory(id);
+
+        try {
+            setDeleteLoading(true);
+            await deleteCustomCategory(cat.id);
+            setDeleteModal(null);
             loadCategories();
+        } catch (err) {
+            setDeleteError('Error al eliminar la categoría');
+        } finally {
+            setDeleteLoading(false);
         }
     };
 
@@ -420,6 +454,84 @@ export function Categories() {
                         >
                             {privacyLoading ? 'Verificando...' : 'Confirmar'}
                         </button>
+                    </div>
+                </div>
+            )}
+            {/* Modal de Eliminación */}
+            {deleteModal && (
+                <div className="modal-overlay" onClick={() => setDeleteModal(null)}>
+                    <div className="modal" onClick={e => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h2 className="modal-title">🗑️ Eliminar categoría</h2>
+                            <button className="modal-close" onClick={() => setDeleteModal(null)}>
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <line x1="18" y1="6" x2="6" y2="18" />
+                                    <line x1="6" y1="6" x2="18" y2="18" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div style={{ marginBottom: '20px' }}>
+                            <p style={{ color: 'var(--text-secondary)', marginBottom: '12px', fontSize: '0.9rem' }}>
+                                ¿Estás seguro de que quieres eliminar la categoría <strong>"{deleteModal.category.name}"</strong>?
+                            </p>
+                            <div style={{
+                                background: 'var(--bg-light)',
+                                padding: '12px',
+                                borderRadius: '8px',
+                                fontSize: '0.85rem',
+                                color: 'var(--text-secondary)',
+                                border: '1px solid var(--border-light)'
+                            }}>
+                                <p style={{ margin: '0 0 8px 0' }}>• Los gastos asociados se moverán a <strong>"Otros"</strong>.</p>
+                                {deleteModal.category.is_private && (
+                                    <p style={{ margin: 0, color: 'var(--balance-negative)', fontWeight: '500' }}>
+                                        ⚠️ IMPORTANTE: Sus datos dejarán de estar ocultos y serán visibles.
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+
+                        {deleteModal.category.is_private && (
+                            <div className="form-group">
+                                <label className="form-label">Confirma con tu contraseña</label>
+                                <input
+                                    type="password"
+                                    className="form-input"
+                                    placeholder="Tu contraseña de HormigApp"
+                                    value={deletePassword}
+                                    onChange={(e) => setDeletePassword(e.target.value)}
+                                    autoFocus
+                                />
+                            </div>
+                        )}
+
+                        {deleteError && (
+                            <p style={{ color: 'var(--balance-negative)', marginBottom: '16px', fontSize: '0.875rem' }}>
+                                {deleteError}
+                            </p>
+                        )}
+
+                        <div style={{ display: 'flex', gap: '12px' }}>
+                            <button
+                                className="btn btn-secondary"
+                                style={{ flex: 1 }}
+                                onClick={() => setDeleteModal(null)}
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                className="btn btn-primary"
+                                style={{
+                                    flex: 2,
+                                    background: deleteModal.category.is_private ? '#e11d48' : 'var(--primary-blue)'
+                                }}
+                                onClick={confirmDelete}
+                                disabled={deleteLoading || (deleteModal.category.is_private && !deletePassword)}
+                            >
+                                {deleteLoading ? 'Eliminando...' : 'Eliminar categoría'}
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

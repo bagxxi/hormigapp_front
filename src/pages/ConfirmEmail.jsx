@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import logoImg from '../assets/hormigapplogo.png';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://hormigapp.onrender.com/api';
 
@@ -69,6 +70,9 @@ export function ConfirmEmail() {
             background: 'var(--bg-light)'
         }}>
             <div style={{ width: '100%', maxWidth: '400px' }}>
+                <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+                    <img src={logoImg} alt="HormigApp" style={{ width: '120px', margin: '0 auto', display: 'block' }} />
+                </div>
                 {success ? (
                     <div className="card" style={{ textAlign: 'center' }}>
                         <div style={{ fontSize: '3rem', marginBottom: '16px' }}>✅</div>

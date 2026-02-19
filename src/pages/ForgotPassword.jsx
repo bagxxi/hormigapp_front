@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import logoImg from '../assets/hormigapplogo.png';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://hormigapp.onrender.com/api';
 
@@ -51,19 +52,7 @@ export function ForgotPassword() {
         }}>
             <div style={{ width: '100%', maxWidth: '400px' }}>
                 <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-                    <div style={{
-                        width: '64px',
-                        height: '64px',
-                        background: 'linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-light) 100%)',
-                        borderRadius: '16px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        margin: '0 auto 16px',
-                        fontSize: '2rem'
-                    }}>
-                        🔐
-                    </div>
+                    <img src={logoImg} alt="HormigApp" style={{ width: '140px', margin: '0 auto 12px', display: 'block' }} />
                     <h1 style={{ fontSize: '1.5rem', marginBottom: '8px' }}>
                         ¿Olvidaste tu contraseña?
                     </h1>
