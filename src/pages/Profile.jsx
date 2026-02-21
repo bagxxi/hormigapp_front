@@ -240,10 +240,10 @@ export function Profile() {
                     </div>
                     <div style={{ textAlign: 'right' }}>
                         <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
-                            Token expira en
+                            Sesión expira en
                         </p>
                         <p style={{ fontSize: '0.875rem', fontWeight: 500 }}>
-                            60 minutos (desde login)
+                            60 minutos (desde inicio de sesión)
                         </p>
                     </div>
                 </div>
@@ -259,7 +259,7 @@ export function Profile() {
                         </p>
                     </div>
                     <button
-                        className="btn btn-secondary"
+                        className="btn btn-primary"
                         onClick={() => {
                             setShowPasswordForm(!showPasswordForm);
                             setPasswordError('');
@@ -346,7 +346,7 @@ export function Profile() {
                         </p>
                     </div>
                     <button
-                        className="btn btn-secondary"
+                        className="btn btn-primary"
                         onClick={() => {
                             setShowAliasForm(!showAliasForm);
                             setAliasError('');

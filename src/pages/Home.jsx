@@ -107,7 +107,7 @@ export function Home() {
                     <div className="setup-banner-icon">📋</div>
                     <h3>¡Configura tu presupuesto!</h3>
                     <p>Para comenzar a registrar tus gastos hormiga, primero debes configurar tu ingreso mensual y meta de ahorro.</p>
-                    <Link to="/presupuesto" className="btn btn-primary" style={{ marginTop: '16px' }}>
+                    <Link to="/presupuesto" className="btn btn-primary" style={{ marginTop: '16px', textDecoration: 'none' }}>
                         Configurar presupuesto
                     </Link>
                 </div>

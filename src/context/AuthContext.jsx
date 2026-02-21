@@ -51,8 +51,14 @@ export function AuthProvider({ children }) {
         if (!response.ok) {
             const contentType = response.headers.get('content-type');
             if (contentType && contentType.includes('application/json')) {
-                const error = await response.json();
-                throw new Error(error.detail || JSON.stringify(error) || 'Error al iniciar sesión');
+                const errorData = await response.json();
+                // Extraer mensaje: prioridad al campo 'error', luego 'detail', luego primer campo de validación
+                const message = errorData.error ||
+                    errorData.detail ||
+                    (typeof errorData === 'object' ? Object.values(errorData)[0] : null) ||
+                    'Error al iniciar sesión';
+
+                throw new Error(Array.isArray(message) ? message[0] : message);
             } else {
                 throw new Error(`Error del servidor (${response.status}). Asegúrate de que el backend esté ejecutándose.`);
             }
@@ -83,8 +89,13 @@ export function AuthProvider({ children }) {
         if (!response.ok) {
             const contentType = response.headers.get('content-type');
             if (contentType && contentType.includes('application/json')) {
-                const error = await response.json();
-                throw new Error(JSON.stringify(error));
+                const errorData = await response.json();
+                const message = errorData.error ||
+                    errorData.detail ||
+                    (typeof errorData === 'object' ? Object.values(errorData)[0] : null) ||
+                    'Error al registrar usuario';
+
+                throw new Error(Array.isArray(message) ? message[0] : message);
             } else {
                 throw new Error(`Error del servidor (${response.status}). El registro falló con una respuesta no válida.`);
             }

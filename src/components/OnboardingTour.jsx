@@ -75,11 +75,6 @@ export function OnboardingTour({ onComplete, onSkip }) {
 
     useEffect(() => {
         if (step.type === 'tooltip' && step.targetNav) {
-            // Navegar a la página correspondiente si no estamos ahí
-            if (step.path && location.pathname !== step.path) {
-                navigate(step.path);
-            }
-
             // Posicionar el tooltip cerca del elemento de navegación
             setTimeout(() => {
                 positionTooltip();
@@ -103,9 +98,11 @@ export function OnboardingTour({ onComplete, onSkip }) {
                     left: Math.max(16, Math.min(rect.left + rect.width / 2 - tooltipRect.width / 2, window.innerWidth - tooltipRect.width - 16))
                 });
             } else {
+                // Desktop: Boundary check to avoid overflow on the right
+                const leftPos = rect.left + rect.width / 2 - tooltipRect.width / 2;
                 setTooltipPosition({
                     top: rect.bottom + 12,
-                    left: Math.max(16, rect.left + rect.width / 2 - tooltipRect.width / 2)
+                    left: Math.max(16, Math.min(leftPos, window.innerWidth - tooltipRect.width - 24))
                 });
             }
         }

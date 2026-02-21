@@ -30,6 +30,7 @@ export function Categories() {
     const [deletePassword, setDeletePassword] = useState('');
     const [deleteError, setDeleteError] = useState('');
     const [deleteLoading, setDeleteLoading] = useState(false);
+    const [sortBy, setSortBy] = useState('creation'); // 'creation' | 'alphabetical'
 
     const {
         getCustomCategories, addCustomCategory, updateCustomCategory,
@@ -174,7 +175,23 @@ export function Categories() {
             {/* Category List */}
             <div className="card" style={{ marginBottom: '16px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                    <h3>🏷️ Categorías</h3>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <h3>🏷️ Categorías</h3>
+                        <select
+                            value={sortBy}
+                            onChange={(e) => setSortBy(e.target.value)}
+                            style={{
+                                padding: '4px 8px',
+                                borderRadius: '6px',
+                                border: '1px solid var(--border-light)',
+                                fontSize: '0.75rem',
+                                background: 'white'
+                            }}
+                        >
+                            <option value="creation">Por orden agregado</option>
+                            <option value="alphabetical">Alfabéticamente</option>
+                        </select>
+                    </div>
                     <button
                         className="btn btn-primary"
                         onClick={() => setShowAddForm(!showAddForm)}
@@ -200,7 +217,7 @@ export function Categories() {
                                 placeholder="Ej: Gimnasio, Mascotas..."
                                 value={newName}
                                 onChange={(e) => setNewName(e.target.value)}
-                                maxLength={50}
+                                maxLength={30}
                                 required
                                 autoFocus
                             />
@@ -272,7 +289,13 @@ export function Categories() {
                     </div>
                 ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                        {categories.map((cat) => (
+                        {[...categories].sort((a, b) => {
+                            if (sortBy === 'alphabetical') {
+                                return a.name.localeCompare(b.name);
+                            }
+                            // Orden por creación (ID o created_at)
+                            return new Date(a.created_at) - new Date(b.created_at);
+                        }).map((cat) => (
                             <div key={cat.id} style={{
                                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                                 padding: '12px 16px',
@@ -302,7 +325,7 @@ export function Categories() {
                                             value={editName}
                                             onChange={(e) => setEditName(e.target.value)}
                                             style={{ flex: 1, padding: '6px 10px' }}
-                                            maxLength={50}
+                                            maxLength={30}
                                         />
                                         <button
                                             onClick={() => handleEdit(cat.id)}
