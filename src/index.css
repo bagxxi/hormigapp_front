@@ -551,20 +551,12 @@ body {
 }
 
 /* Loading spinner */
-.spinner {
-  width: 24px;
-  height: 24px;
-  border: 2px solid var(--border-light);
-  border-top-color: var(--primary-blue);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+/* Sombras mejoradas */
+:root {
+  --shadow-md: 0 8px 16px -4px rgba(0, 0, 0, 0.1), 0 4px 8px -4px rgba(0, 0, 0, 0.06);
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
+/* Redundant spinner removed in favor of custom Loader */
 
 /* Empty state */
 .empty-state {

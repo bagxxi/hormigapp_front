@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useApi } from '../hooks/useApi';
 import { EditExpenseModal } from '../components/EditExpenseModal';
+import { Loader } from '../components/Loader';
 
 export function Budget() {
     const [budget, setBudget] = useState(null);
@@ -97,12 +98,7 @@ export function Budget() {
     };
 
     if (loading) {
-        return (
-            <div className="empty-state">
-                <div className="spinner"></div>
-                <p>Cargando presupuesto...</p>
-            </div>
-        );
+        return <Loader message="Cargando presupuesto..." />;
     }
 
     return (
@@ -110,7 +106,7 @@ export function Budget() {
             <h1 style={{ marginBottom: '24px' }}>Presupuesto</h1>
 
             {/* Ingreso mensual */}
-            <div className="card" style={{ marginBottom: '16px' }}>
+            <div className="card" style={{ marginBottom: '24px' }}>
                 <h3 style={{ marginBottom: '16px' }}>Ingreso mensual</h3>
                 <div className="form-group" style={{ marginBottom: 0 }}>
                     <label className="form-label">Ingreso líquido mensual (CLP)</label>
@@ -126,7 +122,7 @@ export function Budget() {
             </div>
 
             {/* Meta de ahorro */}
-            <div className="card" style={{ marginBottom: '16px' }}>
+            <div className="card" style={{ marginBottom: '24px' }}>
                 <h3 style={{ marginBottom: '16px' }}>Meta de ahorro</h3>
                 <div className="form-group" style={{ marginBottom: 0 }}>
                     <label className="form-label">Cuánto quieres ahorrar cada mes (CLP)</label>
@@ -142,7 +138,7 @@ export function Budget() {
             </div>
 
             {/* Día de ciclo */}
-            <div className="card" style={{ marginBottom: '16px' }}>
+            <div className="card" style={{ marginBottom: '24px' }}>
                 <h3 style={{ marginBottom: '16px' }}>Día de inicio del ciclo</h3>
                 <div className="form-group" style={{ marginBottom: 0 }}>
                     <label className="form-label">¿Qué día del mes recibes tu sueldo? (1-28)</label>
@@ -166,14 +162,14 @@ export function Budget() {
             <button
                 onClick={handleSaveBudget}
                 className="btn btn-primary"
-                style={{ width: '100%', padding: '12px', marginBottom: '16px' }}
+                style={{ width: '100%', padding: '12px', marginBottom: '24px' }}
                 disabled={saving}
             >
                 {saving ? 'Guardando...' : 'Guardar cambios'}
             </button>
 
             {/* Gastos fijos */}
-            <div className="card" style={{ marginBottom: '16px' }}>
+            <div className="card" style={{ marginBottom: '24px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                     <h3>Gastos fijos</h3>
                     <button className="btn btn-secondary" onClick={() => setShowAddFixed(!showAddFixed)}>

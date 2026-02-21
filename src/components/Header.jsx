@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import logoImg from '../assets/logotipo_hormiga.png';
 
@@ -7,9 +7,9 @@ export function Header() {
 
     return (
         <header className="header">
-            <div className="header-logo">
+            <Link to="/" className="header-logo" style={{ textDecoration: 'none' }}>
                 <img src={logoImg} alt="HormigApp" style={{ height: '32px', objectFit: 'contain' }} />
-            </div>
+            </Link>
 
             <nav className="header-nav">
                 <NavLink id="nav-home" to="/" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>

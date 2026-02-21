@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useApi } from '../hooks/useApi';
+import { Loader } from '../components/Loader';
 
 const EMOJI_OPTIONS = ['📌', '🎯', '💊', '🎁', '🏠', '🚗', '💻', '📱', '🎵', '🍺', '🌮', '💇', '🏋️', '📚', '🎬', '✈️', '🎮', '👕', '💰', '🔒'];
 
@@ -157,12 +158,7 @@ export function Categories() {
     };
 
     if (loading) {
-        return (
-            <div className="empty-state">
-                <div className="spinner" style={{ margin: '0 auto' }}></div>
-                <p>Cargando categorías...</p>
-            </div>
-        );
+        return <Loader message="Cargando categorías..." />;
     }
 
     return (
@@ -173,7 +169,7 @@ export function Categories() {
             </p>
 
             {/* Category List */}
-            <div className="card" style={{ marginBottom: '16px' }}>
+            <div className="card" style={{ marginBottom: '16px', boxShadow: 'var(--shadow-lg)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <h3>🏷️ Categorías</h3>

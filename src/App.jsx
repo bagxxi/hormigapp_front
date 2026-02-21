@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Layout } from './components/Layout';
+import { Loader } from './components/Loader';
 import { Home } from './pages/Home';
 import { Login } from './pages/Login';
 import { History } from './pages/History';
@@ -17,16 +18,7 @@ function PrivateRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
-    return (
-      <div style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}>
-        <div className="spinner"></div>
-      </div>
-    );
+    return <Loader message="" />;
   }
 
   return isAuthenticated ? children : <Navigate to="/login" />;

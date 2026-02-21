@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useApi } from '../hooks/useApi';
+import { Loader } from '../components/Loader';
 import { EditExpenseModal } from '../components/EditExpenseModal';
 
 const CATEGORY_ICONS = {
@@ -92,12 +93,7 @@ export function History() {
     };
 
     if (loading) {
-        return (
-            <div className="empty-state">
-                <div className="spinner"></div>
-                <p>Cargando historial...</p>
-            </div>
-        );
+        return <Loader message="Cargando historial..." />;
     }
 
     // Group expenses by date

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { Loader } from '../components/Loader';
 import logoImg from '../assets/hormigapplogo.png';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://hormigapp.onrender.com/api';
@@ -84,16 +85,7 @@ export function ResetPassword() {
     };
 
     if (verifying) {
-        return (
-            <div style={{
-                minHeight: '100vh',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-            }}>
-                <div className="spinner"></div>
-            </div>
-        );
+        return <Loader message="Verificando enlace..." />;
     }
 
     return (

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { Loader } from '../components/Loader';
 import logoImg from '../assets/hormigapplogo.png';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://hormigapp.onrender.com/api';
@@ -45,19 +46,7 @@ export function ConfirmEmail() {
     };
 
     if (loading) {
-        return (
-            <div style={{
-                minHeight: '100vh',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexDirection: 'column',
-                gap: '16px'
-            }}>
-                <div className="spinner"></div>
-                <p>Confirmando cambio de email...</p>
-            </div>
-        );
+        return <Loader message="Confirmando cambio de email..." />;
     }
 
     return (

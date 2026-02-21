@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { Loader } from '../components/Loader';
 import { useApi } from '../hooks/useApi';
 import { AddExpenseModal } from '../components/AddExpenseModal';
 import { EditExpenseModal } from '../components/EditExpenseModal';
@@ -87,12 +88,7 @@ export function Home() {
     };
 
     if (loading) {
-        return (
-            <div className="empty-state">
-                <div className="spinner"></div>
-                <p>Cargando...</p>
-            </div>
-        );
+        return <Loader message="Cargando vista..." />;
     }
 
     // Verificar si el presupuesto está configurado (monthly_income > 0)
